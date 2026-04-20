@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>🎯ルーレット🎯</title>
 <style>
-  /* 元のスタイルを完全維持 */
   body { margin: 0; color: #fff; font-family: sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow-x: hidden; background: #444; transition: background 0.1s; padding: 20px 0; box-sizing: border-box; }
   
   h2 { 
@@ -37,29 +36,27 @@
   .btn-single { width: 100%; padding: 15px; font-size: 18px; background: #ff4081; color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
   #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 90; }
   
-  /* 追加：起動時入力用スタイル */
-  #setupOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #222; z-index: 2000; display: flex; align-items: center; justify-content: center; }
-  .setup-box { background: #fff; color: #333; padding: 25px; border-radius: 20px; width: 85%; max-width: 340px; text-align: center; }
-  .setup-box h3 { margin-top: 0; color: #ff4081; }
-  .setup-box input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-
   .security-notice { max-width: 600px; width: 90%; margin: 40vh auto 40px; padding: 25px; background: rgba(0, 0, 0, 0.7); border: 2px solid #ff4081; border-radius: 15px; font-size: 14px; line-height: 1.7; text-align: left; color: #fff; box-shadow: 0 0 20px rgba(255,64,129,0.3); }
   .security-notice summary { cursor: pointer; outline: none; list-style: none; display: flex; justify-content: space-between; align-items: center; }
   .security-notice summary::-webkit-details-marker { display: none; }
   .security-notice b { color: #ff0000; font-size: 1.1em; }
   .toggle-icon { display: inline-block; transition: transform 0.3s; font-size: 18px; margin-left: 10px; }
   details[open] .toggle-icon { transform: rotate(180deg); }
+
+  /* 入力画面用の追加スタイル */
+  #setupOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #222; z-index: 9999; display: flex; align-items: center; justify-content: center; }
+  .setup-box { background: #fff; color: #333; padding: 25px; border-radius: 20px; width: 85%; max-width: 340px; text-align: center; }
+  .setup-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
 </style>
 </head>
 <body>
 
 <div id="setupOverlay">
   <div class="setup-box">
-    <h3>⚙️ 初期設定</h3>
-    <p style="font-size:12px; color:#666;">情報を埋め込まないための設定です</p>
+    <h2 style="background:none; color:#333; transform:none; border:none; backdrop-filter:none;">⚙️ 設定</h2>
     <input type="text" id="setToken" placeholder="Bot Tokenを入力">
     <input type="text" id="setID" placeholder="Chat IDを入力">
-    <button class="primary-btn-flat" id="startAppBtn" style="margin-top:15px; width:100%;">この情報でスタート</button>
+    <button class="primary-btn-flat" id="startAppBtn" style="margin-top:10px; width:100%;">開始</button>
   </div>
 </div>
 
@@ -105,22 +102,41 @@
 </details>
 
 <script>
-// --- 変更点：変数を空にして入力から受け取るようにした ---
 let BOT_TOKEN = "";
 let CHAT_ID = "";
 
-document.getElementById("startAppBtn").onclick = function() {
+// トークンの存在確認機能
+document.getElementById("startAppBtn").onclick = async function() {
   const t = document.getElementById("setToken").value.trim();
   const i = document.getElementById("setID").value.trim();
-  if(t && i) {
-    BOT_TOKEN = t;
-    CHAT_ID = i;
-    document.getElementById("setupOverlay").style.display = "none";
-  } else {
-    alert("TokenとIDを入力してください。");
+  
+  if(!t || !i) {
+    alert("TokenとIDを入力してください");
+    return;
+  }
+
+  this.disabled = true;
+  this.textContent = "検証中...";
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${t}/getMe`);
+    const data = await res.json();
+
+    if(data.ok) {
+      BOT_TOKEN = t;
+      CHAT_ID = i;
+      document.getElementById("setupOverlay").style.display = "none";
+    } else {
+      alert("エラー：トークンが無効です。BotFatherから取得した正しいトークンを入力してください。");
+      this.disabled = false;
+      this.textContent = "開始";
+    }
+  } catch(e) {
+    alert("通信エラー：ネット接続を確認してください。");
+    this.disabled = false;
+    this.textContent = "開始";
   }
 };
-// --- 変更点ここまで ---
 
 let hue = 0;
 function animateBG() {
