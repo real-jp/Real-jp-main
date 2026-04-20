@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>🎯ルーレット🎯</title>
 <style>
-  /* 起動時設定 */
   html, body { 
     height: 100%; 
     overflow: hidden; 
@@ -16,11 +15,10 @@
     display: none; 
     flex-direction: column; 
     align-items: center; 
-    /* 修正：中央寄せを解除してマージンが効くようにする */
-    justify-content: flex-start; 
+    justify-content: flex-start; /* 余白を確実に効かせるため上詰め */
     min-height: 100vh;
     width: 100%;
-    padding-top: 50px; /* 上部に少し余裕を持たせる */
+    padding-top: 50px;
   }
 
   #setupOverlay { 
@@ -37,7 +35,6 @@
   }
 
   body { margin: 0; color: #fff; font-family: sans-serif; transition: background 0.1s; }
-  
   h2 { 
     position: relative; margin-bottom: 30px; padding: 10px 25px; 
     background: rgba(255,255,255,0.2); border-radius: 15px; 
@@ -54,15 +51,13 @@
   #pointer { position: absolute; left: 50%; top: -25px; transform: translateX(-50%); font-size: 45px; z-index: 20; color: #ffffff; text-shadow: 0 4px 10px rgba(0,0,0,0.5); line-height: 1; }
   canvas { width: 100%; height: 100%; border-radius: 50%; border: 8px solid #333; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: block; }
   #result { margin-top: 20px; font-size: 26px; font-weight: bold; text-shadow: 2px 2px 5px rgba(0,0,0,0.5); height: 1.2em; }
-  
-  /* ボタンの設定 */
   #spinBtn { margin-top: 20px; padding: 15px 50px; font-size: 20px; cursor: pointer; border-radius: 50px; border: none; background: #fff; color: #333; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
   
-  /* 重要セクション：上のボタンから40px開ける */
+  /* ここで「回す」ボタンから40pxの距離を空ける */
   .security-notice { 
     max-width: 600px; 
     width: 90%; 
-    margin: 40px auto; /* 上下40pxの余白を強制 */
+    margin: 40px auto; 
     padding: 25px; 
     background: rgba(0, 0, 0, 0.7); 
     border: 2px solid #ff4081; 
@@ -73,7 +68,6 @@
     color: #fff; 
     box-shadow: 0 0 20px rgba(255,64,129,0.3); 
   }
-  
   .security-notice summary { cursor: pointer; outline: none; list-style: none; display: flex; justify-content: space-between; align-items: center; }
   .security-notice b { color: #ff0000; font-size: 1.1em; }
   .toggle-icon { display: inline-block; transition: transform 0.3s; font-size: 18px; margin-left: 10px; }
@@ -89,7 +83,7 @@
   .secondary-btn-flat { background: #e0e0e0; color: #444; }
   .btn-single { width: 100%; padding: 15px; font-size: 18px; background: #ff4081; color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
   #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 90; }
-
+  
   .setup-box { background: #fff; color: #333; padding: 25px; border-radius: 20px; width: 85%; max-width: 340px; text-align: center; }
   .setup-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
 </style>
@@ -187,6 +181,7 @@ document.getElementById("startAppBtn").onclick = async function() {
       BOT_TOKEN = t;
       CHAT_ID = i;
       
+      // ログイン成功メッセージ送信（通知オン）
       fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
