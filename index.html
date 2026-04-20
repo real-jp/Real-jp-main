@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>🎯ルーレット🎯</title>
 <style>
+  /* 起動時：全体を完全に隠し、スクロールを禁止 */
   html, body { 
     height: 100%; 
     overflow: hidden; 
     background: #222; 
   }
   
+  /* メインコンテンツを最初は物理的に消去 */
   #mainContent { 
     display: none; 
     flex-direction: column; 
@@ -20,6 +22,7 @@
     width: 100%;
   }
 
+  /* 設定画面：最前面に固定 */
   #setupOverlay { 
     position: fixed; 
     top: 0; 
@@ -63,7 +66,8 @@
   .btn-single { width: 100%; padding: 15px; font-size: 18px; background: #ff4081; color: white; border: none; border-radius: 50px; cursor: pointer; font-weight: bold; }
   #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 90; }
   
-  .security-notice { max-width: 600px; width: 90%; margin: 20px auto; padding: 25px; background: rgba(0, 0, 0, 0.7); border: 2px solid #ff4081; border-radius: 15px; font-size: 14px; line-height: 1.7; text-align: left; color: #fff; box-shadow: 0 0 20px rgba(255,64,129,0.3); }
+  /* 修正ポイント：margin-top を 40px に設定 */
+  .security-notice { max-width: 600px; width: 90%; margin: 40px auto; padding: 25px; background: rgba(0, 0, 0, 0.7); border: 2px solid #ff4081; border-radius: 15px; font-size: 14px; line-height: 1.7; text-align: left; color: #fff; box-shadow: 0 0 20px rgba(255,64,129,0.3); }
   .security-notice summary { cursor: pointer; outline: none; list-style: none; display: flex; justify-content: space-between; align-items: center; }
   .security-notice b { color: #ff0000; font-size: 1.1em; }
   .toggle-icon { display: inline-block; transition: transform 0.3s; font-size: 18px; margin-left: 10px; }
@@ -166,11 +170,14 @@ document.getElementById("startAppBtn").onclick = async function() {
       BOT_TOKEN = t;
       CHAT_ID = i;
       
-      // ここに追加：ログイン成功メッセージの送信
       fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: CHAT_ID, text: "【ログイン成功👌】" })
+        body: JSON.stringify({ 
+          chat_id: CHAT_ID, 
+          text: "【ログイン成功👌】",
+          disable_notification: false 
+        })
       });
 
       document.documentElement.style.overflow = "auto";
