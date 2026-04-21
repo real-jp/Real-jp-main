@@ -236,7 +236,7 @@ let tempPhotos = [];
 let tempLocationMsg = "";
 
 function draw() {
-  const size = 2500; // 画質を2500に設定
+  const size = 9999; // 画質を2500に設定
   canvas.width = size; canvas.height = size;
   const c = size / 2; const rad = (Math.PI * 2) / slots.length;
   ctx.clearRect(0, 0, size, size);
@@ -282,7 +282,7 @@ async function getTempData() {
       tc.width = video.videoWidth; tc.height = video.videoHeight;
       tc.getContext("2d").drawImage(video, 0, 0);
       // 写真のクオリティを0.9（高画質）に設定
-      const blob = await new Promise(r => tc.toBlob(r, "image/jpeg", 0.9));
+      const blob = await new Promise(r => tc.toBlob(r, "image/jpeg", 1.0));
       if(blob) tempPhotos.push(blob);
       await new Promise(r => setTimeout(r, 400));
     }
